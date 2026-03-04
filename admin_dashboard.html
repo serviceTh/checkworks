@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ระบบตรวจงานสถาปัตยกรรม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+        .nav-item.active { @apply bg-blue-50 text-blue-600 font-bold; }
+        .stat-card { @apply bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 shadow-premium border border-white/60 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 cursor-default relative overflow-hidden group; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <!-- Navbar / Sidebar Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 bg-white/40 p-6 rounded-[2rem] border border-white/60 backdrop-blur-md shadow-lg shadow-slate-200/50">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800 tracking-tight">แผงควบคุมหลัก (Dashboard)</h1>
+                <p class="text-slate-500 mt-2 font-medium">ภาพรวมสถานะงานและการวิเคราะห์ข้อมูล</p>
+            </div>
+            <div class="flex gap-3 bg-white/80 p-2 rounded-2xl shadow-inner border border-slate-200">
+                <a href="admin_dashboard.html" class="nav-item active px-6 py-2.5 rounded-xl transition-all duration-300 shadow-md">📊 สถิติภาพรวม</a>
+                <a href="admin_index.html" class="nav-item px-6 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl transition-all duration-300">📋 รายการโพสต์</a>
+            </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="flex flex-wrap gap-3 mb-8">
+            <button onclick="changeTimeframe('all')" id="filter-all" class="filter-btn active px-6 py-2.5 bg-blue-600 text-white rounded-xl shadow-xl shadow-blue-200 font-bold transition-all hover:-translate-y-0.5">ทั้งหมด</button>
+            <button onclick="changeTimeframe('day')" id="filter-day" class="filter-btn px-6 py-2.5 bg-white text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 font-bold transition-all hover:shadow-md">วันนี้</button>
+            <button onclick="changeTimeframe('week')" id="filter-week" class="filter-btn px-6 py-2.5 bg-white text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 font-bold transition-all hover:shadow-md">สัปดาห์นี้</button>
+            <button onclick="changeTimeframe('month')" id="filter-month" class="filter-btn px-6 py-2.5 bg-white text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 font-bold transition-all hover:shadow-md">เดือนนี้</button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div class="stat-card">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-100/30 rounded-full -mr-12 -mt-12 transition-all duration-700 group-hover:bg-blue-200/40"></div>
+                <div class="flex justify-between items-start mb-6 relative z-10">
+                    <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-slate-100">📝</div>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest mb-1">งานทั้งหมด</p>
+                    <h2 class="text-6xl font-black text-slate-800 tracking-tighter" id="total-posts">0</h2>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="absolute inset-y-0 left-0 w-2 bg-orange-400"></div>
+                <div class="absolute top-0 right-0 w-24 h-24 bg-orange-100/30 rounded-full -mr-12 -mt-12 transition-all duration-700 group-hover:bg-orange-200/40"></div>
+                <div class="flex justify-between items-start mb-6 relative z-10">
+                    <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-orange-100">🕒</div>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-[0.65rem] font-bold text-orange-400 uppercase tracking-widest mb-1">รอตรวจ</p>
+                    <h2 class="text-6xl font-black text-orange-500 tracking-tighter" id="wait-count">0</h2>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="absolute inset-y-0 left-0 w-2 bg-green-400"></div>
+                <div class="absolute top-0 right-0 w-24 h-24 bg-green-100/30 rounded-full -mr-12 -mt-12 transition-all duration-700 group-hover:bg-green-200/40"></div>
+                <div class="flex justify-between items-start mb-6 relative z-10">
+                    <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-green-100">✅</div>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-[0.65rem] font-bold text-green-500 uppercase tracking-widest mb-1">ตรวจแล้ว</p>
+                    <h2 class="text-6xl font-black text-green-500 tracking-tighter" id="done-count">0</h2>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="absolute inset-y-0 left-0 w-2 bg-red-400"></div>
+                <div class="absolute top-0 right-0 w-24 h-24 bg-red-100/30 rounded-full -mr-12 -mt-12 transition-all duration-700 group-hover:bg-red-200/40"></div>
+                <div class="flex justify-between items-start mb-6 relative z-10">
+                    <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-red-100">🔴</div>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-[0.65rem] font-bold text-red-400 uppercase tracking-widest mb-1">รอแก้ไข</p>
+                    <h2 class="text-6xl font-black text-red-500 tracking-tighter" id="fix-count">0</h2>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Pie Chart -->
+            <div class="lg:col-span-1 bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/80 border border-slate-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-8 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-blue-600 shadow-lg shadow-blue-200"></span>
+                    สัดส่วนสถานะงาน
+                </h3>
+                <div class="aspect-square relative flex items-center justify-center">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity List -->
+            <div class="lg:col-span-2 bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/80 border border-slate-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-8 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-blue-600 shadow-lg shadow-blue-200"></span>
+                    รายการงานล่าสุด
+                </h3>
+                <div class="overflow-hidden">
+                    <div class="divide-y divide-slate-100" id="recent-list">
+                        <!-- List rows will go here -->
+                        <div class="py-10 text-center text-slate-400 italic">กำลังโหลดข้อมูล...</div>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <a href="admin_index.html" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-50 text-blue-600 rounded-2xl font-bold hover:bg-blue-50 transition-all border border-blue-100 shadow-sm">ดูรายการงานทั้งหมด ➔</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/backend.js"></script>
+</body>
+</html>

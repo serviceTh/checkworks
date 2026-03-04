@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สร้างโพสต์ตรวจงาน - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: 'Prompt', sans-serif; background-color: #f7f3ee; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body class="bg-texture min-h-screen pb-20">
+
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white/60 rounded-[2.5rem] shadow-premium p-10 mb-10 border border-white/60 backdrop-blur-md flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden group">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-[#b89474]/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-[#b89474]/20 transition-all duration-700"></div>
+      <div class="relative z-10">
+        <h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+          <span class="w-2 h-8 bg-[#b89474] rounded-full"></span>
+          สร้างโพสต์ตรวจงานใหม่
+        </h1>
+        <p class="text-slate-500 mt-2 font-medium">สร้างรายการตรวจสอบสำหรับส่งให้หน้าบ้านดำเนินงาน</p>
+      </div>
+      <div class="flex gap-3 relative z-10">
+        <a href="admin_index.html" class="px-6 py-3 bg-white/80 text-slate-600 rounded-2xl hover:bg-white transition-all font-bold shadow-sm border border-slate-200">ย้อนกลับ</a>
+        <button id="save-post-btn" class="px-8 py-3 bg-slate-800 text-white rounded-2xl hover:bg-slate-900 transition-all font-bold shadow-xl shadow-slate-200 active:scale-95">บันทึกโพสต์</button>
+      </div>
+    </div>
+
+    <div class="bg-white/80 rounded-[2rem] shadow-xl p-8 mb-10 border border-white/40 space-y-8">
+      <h3 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
+        <span class="w-1.5 h-6 bg-[#b89474] rounded-full"></span>
+        ข้อมูลหลักของโพสต์
+      </h3>
+      
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-slate-600 ml-1">ชื่อโพสต์ (หมายเลขห้อง / สถานที่) *</label>
+        <input type="text" id="post-title" required placeholder="เช่น ห้อง 405 หรือ บ้านพักริมน้ำ" 
+               class="w-full px-5 py-3.5 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 focus:border-solid outline-none transition-all">
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-slate-600 ml-1">ผู้รับผิดชอบการโพสต์ (Admin/Head) *</label>
+        <select id="poster-name" required 
+                class="w-full px-5 py-3.5 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 focus:border-solid outline-none transition-all font-medium text-slate-700">
+          <option value="">-- เลือกผู้โพสต์ --</option>
+          <option value="คุณเจ">คุณเจ</option>
+          <option value="คุณตังๆ">คุณตังๆ</option>
+          <option value="คุณเอก">คุณเอก</option>
+        </select>
+      </div>
+      
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-slate-600 ml-1">ผู้ตรวจ (รอหน้าบ้านกรอกอัตโนมัติ)</label>
+        <input type="text" id="inspector-name" readonly placeholder="จะถูกกรอกโดยหน้าบ้านเมื่อมีการตรวจงาน" 
+               class="w-full px-5 py-3.5 bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 cursor-not-allowed italic font-medium">
+      </div>
+    </div>
+
+    <!-- หัวข้อที่ 0: ผังหรือแปลน -->
+    <div class="bg-white/80 rounded-[2rem] shadow-xl p-8 mb-10 border border-white/40" id="topic-0" data-topic-id="0">
+      <h3 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
+        <span class="w-1.5 h-6 bg-[#b89474] rounded-full"></span>
+        0. ผังหรือแปลนงาน
+      </h3>
+      <div class="space-y-4">
+        <div class="bg-slate-50/50 p-8 rounded-[2rem] border-2 border-dashed border-slate-200">
+          <label class="block text-sm font-black text-slate-700 mb-4 flex items-center gap-2">
+            📸 แนบรูปผังหรือแปลน <span class="text-xs font-medium text-slate-400">(สำหรับ Mark จุดพิกัดงาน)</span>
+          </label>
+          <input type="file" id="plan-image-upload" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-slate-800 file:text-white hover:file:bg-slate-900 transition-all cursor-pointer">
+          <div id="plan-image-preview" class="mt-8 flex justify-center"></div>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-slate-600 ml-1">🔗 ลิ้ง Google Drive สำหรับดูงาน (ถ้ามี)</label>
+          <input type="url" class="drive-link" id="drive-link" placeholder="https://drive.google.com/..." 
+                 class="w-full px-5 py-3.5 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 focus:border-solid outline-none transition-all">
+        </div>
+      </div>
+    </div>
+
+    <div id="static-topics-container" class="space-y-8">
+      <!-- Topics 1-18 will be injected by backend.js -->
+    </div>
+
+    <div id="custom-topics-container" class="space-y-8 mt-8">
+      <!-- Custom topics will be injected here -->
+    </div>
+
+    <div class="text-center mt-12 mb-24">
+      <button id="add-custom-topic-btn" class="px-12 py-5 bg-white text-slate-800 border-2 border-dashed border-slate-300 rounded-[2rem] hover:border-[#b89474] hover:text-[#b89474] transition-all font-black flex items-center gap-3 mx-auto group shadow-sm hover:shadow-xl hover:shadow-[#b89474]/10 active:scale-95">
+        <span class="text-2xl font-light group-hover:rotate-90 transition-transform duration-300 text-[#b89474]">+</span> เพิ่มหัวข้อตรวจงานเพิ่มเติม
+      </button>
+    </div>
+
+  </div>
+
+
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/backend.js"></script>
+</body>
+</html>
